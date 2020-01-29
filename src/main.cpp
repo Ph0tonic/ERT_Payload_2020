@@ -5,6 +5,7 @@
 #include "buzzer.h"
 #include "led.h"
 #include "bno.h"
+#include "bme.h"
 
 // RASPBERRY PI INFOS
 // RUN PIN 14 -> côté USB
@@ -52,6 +53,7 @@ void setup()
     setupBuzzer();
     setupLight();
     setupBno();
+    setupBme();
 
     // /* Use external crystal for better accuracy */
     // bno.setExtCrystalUse(true);
@@ -67,6 +69,7 @@ void loop()
 
     delay(500);
     displaySensorEvents();
+    displayBmeValues();
     lightOff();
 
     delay(200);
