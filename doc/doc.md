@@ -1,4 +1,3 @@
-
 # Procedure
 
 IMU -> 9 axe
@@ -6,7 +5,7 @@ IMU -> 9 axe
 ## Infos
 
 - mercredi soir assemblage fusée
-- mercredi soir Spagethi test -> certifée
+- mercredi soir Spaghetti test -> certifié
 - jeudi matin -> armement (Arduino uniquement)
 
 ## Signaux sonore
@@ -26,7 +25,7 @@ IMU -> 9 axe
 - confirmInject -> Confirmation de l'injection
 - by-pass inject -> If abort has been done
 - rec (Start recording)
-- abort -> Goto standby
+- abort -> Goto idle
 
 ## Triggers
 
@@ -35,9 +34,8 @@ IMU -> 9 axe
 
 ## State
 
-- off -> éteint
-- idle -> Arduino et PI démarré
-- standby -> Arduino make pi in (sleep mode/steady state)
+- idle -> Arduino et PI démarré -> **Initial state**
+- standby -> Arduino démarré, pi in (sleep mode/steady state)
 - injected -> Levures injectés, en attente 
 - ready -> both online and levure injectés
 - recording -> Start detecting decollage

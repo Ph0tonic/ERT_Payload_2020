@@ -7,7 +7,6 @@ static bool setupFail = false;
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
-
 #define BME_SCK 13
 #define BME_MISO 12
 #define BME_MOSI 11
@@ -47,4 +46,24 @@ void setupBme()
     {
         Serial.println("Could not find a valid BME280 sensor, check wiring!");
     }
+}
+
+float getTemperatureC()
+{
+    return bme.readTemperature();
+}
+
+float getPressureP()
+{
+    return bme.readPressure();
+}
+
+float getAltitudeM()
+{
+    return bme.readAltitude(SEALEVELPRESSURE_HPA);
+}
+
+float getHumidity()
+{
+    return bme.readHumidity();
 }

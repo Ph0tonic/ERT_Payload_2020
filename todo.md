@@ -5,5 +5,7 @@
 - [x] Get data from bno 
 - [x] Get data from bme
 - [x] Use buzzer to make noise
-- [ ] State machine
-- [ ] Use timer
+- [x] Use timer
+- [x] State machine
+- [ ] Communication serial with pi
+- [ ] Communication Xbee

@@ -5,6 +5,7 @@
 #include "led.h"
 #include "bno.h"
 #include "bme.h"
+#include "xbeeRf.h"
 
 // RASPBERRY PI INFOS
 // RUN PIN 14 -> côté USB
@@ -37,11 +38,12 @@ enum SignalRF_enum
     ABORT
 };
 
-const float TAKE_OFF_TIME_SEC = 0.500;
-const float FLYING_TIME_SEC = 10.0;// * 60; //TODO: Change this
+const float TAKE_OFF_TIME_MS = 0.500;
+const float TAKE_OFF_ACCELERATION_G = 3.0f;
+const float FLYING_TIME_S = 10.0;// * 60; //TODO: Change this
 
 uint8_t state;
-time_t timer_liftoff = 0;
+time_t timer_takeoff = 0;
 time_t elapsed_time = 0;
 
 void setup()
@@ -63,13 +65,13 @@ void setup()
 SignalRF_enum rfSignals[] = {GET_STATE, SHUTDOWN, GET_STATE, WAKE, GET_STATE, INJECT, GET_STATE, REC, GET_STATE};
 const int nbSignals = (sizeof(rfSignals) / sizeof(SignalRF_enum));
 
-void state_machine_run(uint8_t rf_signal);
+void stateMachineRun(uint8_t rf_signal);
 bool inject();
-void start_recording();
-void stop_recording();
-SignalRF_enum read_rf();
-bool detect_liftoff();
-void sonor_signal_state();
+void startRecording();
+void stopRecording();
+SignalRF_enum readRF();
+bool detectLiftoff();
+void sonorSignalState();
 
 void loop()
 {
@@ -77,7 +79,7 @@ void loop()
     for (unsigned int i = 0; i < nbSignals; ++i)
     {
         lightOn();
-        state_machine_run(rfSignals[i]);
+        stateMachineRun(rfSignals[i]);
         delay(200);
         lightOff();
     }
@@ -90,11 +92,11 @@ void loop()
 
     // delay(200);
 
-    // state_machine_run(read_rf());
+    // stateMachineRun(readRF());
     // delay(10);
 }
 
-void state_machine_run(uint8_t rf_signal)
+void stateMachineRun(uint8_t rf_signal)
 {
     switch (rf_signal)
     {
@@ -145,7 +147,7 @@ void state_machine_run(uint8_t rf_signal)
         switch (rf_signal)
         {
         case REC:
-            start_recording();
+            startRecording();
             state = s_RECORDING;
             break;
         }
@@ -156,22 +158,21 @@ void state_machine_run(uint8_t rf_signal)
         switch (rf_signal)
         {
         case ABORT:
-            stop_recording();
-            state = s_IDLE; //TODO IDLE or StandBy ? -> if standby then set pi to sleeping mode
+            stopRecording();
+            state = s_IDLE;
             break;
         }
         //TODO Start detecting lift off
-        if (detect_liftoff())
+        if (detectLiftoff())
         {
             //TODO After liftoff Start timer and when timer is over then switch to LANDED state
-            timer_liftoff = millis();
             state = s_FLYING;
         }
         break;
 
     case s_FLYING:
         elapsed_time = millis();
-        if (timer_liftoff != 0 && (elapsed_time - timer_liftoff)/1000 >= FLYING_TIME_SEC)
+        if (timer_takeoff != 0 && (elapsed_time - timer_takeoff)/1000 >= FLYING_TIME_S)
         {
             state = s_LANDED;
         }
@@ -192,25 +193,32 @@ bool inject()
     return true;
 }
 
-void start_recording()
+void startRecording()
 {
 }
 
-void stop_recording()
+void stopRecording()
 {
 }
 
-SignalRF_enum read_rf()
+SignalRF_enum readRF()
 {
     return NONE;
 }
 
-bool detect_liftoff()
+bool detectLiftoff()
 {
-    return true;
+    float acc = 0;// TODO: getG();
+    elapsed_time = millis();
+    if(acc < TAKE_OFF_ACCELERATION_G)
+    {
+        timer_takeoff = millis();
+        return false;
+    }
+    return (timer_takeoff != 0 && (elapsed_time - timer_takeoff) >= TAKE_OFF_TIME_MS);
 }
 
-void sonor_signal_state()
+void sonorSignalState()
 {
     switch (state)
     {
