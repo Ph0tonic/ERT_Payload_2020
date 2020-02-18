@@ -33,7 +33,8 @@ void readData()
 void sendPiOrder(PiOrder order)
 {
     //serial.write(12);
-    serial.println("Test");
+    //serial.println("Test");
+    serial.println("3 ls");
     serial.flush();
 }
 

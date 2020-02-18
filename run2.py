@@ -1,8 +1,52 @@
 #!/usr/bin/env python3.6
 
-import serial
+from serial import Serial
 
-ser = serial.Serial("/dev/ttyS0",9600,timeout=1)
+#port = "/dev/ttyAMA0"
+port = "/dev/ttyS0"
+try:
+	ser = Serial(port,9600,timeout=3.0)
+except:
+	print("WARNING! Si le port `/dev/ttyS0` n'est pas reconnu ou n'existe pas, suivre la documentation dans le fichier pi.md")
+	exit(-1)
+
+def startRecording(_):
+	return "Start recording"
+
+def stopRecording(_):
+	return "Stop recording"
+
+def customCmd(cmd):
+	return 'Cmd `'+cmd+'` treated sucessfully'
+
+def manageOrder(order):
+	switcher = {
+		1: startRecording,
+		2: stopRecording,
+		3: customCmd
+	}
+	params = None
+	if(len(order.split(' ', 1)) == 1):
+		number = order
+	else:
+		[number,params] = order.split(' ', 1)
+	number = int(number)
+
+	func = switcher.get(number, lambda: "Invalid cmd")
+	print(func(params))
+
+def parseCommande(order):
+	pass
+
 while True:
+	#received = ser.readline()
 	received = ser.readline()
-	print(received.decode('utf-8'))
+	#print(received)
+	#print(int.from_bytes(received, "big"))
+	#print(int.from_bytes(received, "little"))
+	cmd = received.decode('utf-8').rstrip()
+
+	# TODO: Parse commande
+	if cmd:
+		print("Start managing order : " + cmd)
+		manageOrder(cmd)

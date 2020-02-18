@@ -14,8 +14,8 @@ sudo usermod -a -G dialout username ; sudo usermod -a -G tty username
 
 # Connexion
 
-- Fil rouge sur le pin 8 UART0 TX
-- Fil noir sur le pin 10 UART0 RX
+- Fil noir sur le pin 8 UART0 TX
+- Fil rouge sur le pin 10 UART0 RX
 
 ## Pi pin map
 
