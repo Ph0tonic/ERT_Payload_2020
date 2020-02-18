@@ -74,17 +74,20 @@ bool detectLiftoff();
 
 void loop()
 {
-    delay(10000);
-    for (unsigned int i = 0; i < nbSignals; ++i)
-    {
-        lightOn();
-        stateMachineRun(rfSignals[i]);
-        delay(200);
-        lightOff();
-    }
-    delay(1000);
+//     delay(10000);
+//     for (unsigned int i = 0; i < nbSignals; ++i)
+//     {
+//         lightOn();
+//         stateMachineRun(rfSignals[i]);
+//         delay(200);
+//         lightOff();
+//     }
+//     delay(1000);
 
-    // delay(500);
+    delay(500);
+    Serial.write("Send order\n");
+    sendPiOrder(PiOrder::START_RECCORD);
+    
     // displaySensorEvents();
     // displayBmeValues();
     // lightOff();

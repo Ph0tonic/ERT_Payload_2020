@@ -7,5 +7,5 @@
 - [x] Use buzzer to make noise
 - [x] Use timer
 - [x] State machine
-- [ ] Communication serial with pi
+- [x] Communication serial with pi
 - [ ] Communication Xbee

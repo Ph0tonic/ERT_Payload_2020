@@ -3,7 +3,7 @@
 
 #include "pi.h"
 
-#define serial Serial1
+#define serial Serial4
 
 void setupPi()
 {
@@ -32,7 +32,8 @@ void readData()
 
 void sendPiOrder(PiOrder order)
 {
-    serial.write(order);
+    //serial.write(12);
+    serial.println("Test");
     serial.flush();
 }
 
