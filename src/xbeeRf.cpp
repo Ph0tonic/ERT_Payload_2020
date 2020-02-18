@@ -43,7 +43,7 @@ void setupXbee()
 /**
  * Order must be a String and and with a "\n"
  */
-void send(uint8_t *order, uint64_t length)
+void send(uint8_t *order, uint8_t length)
 {
     // // Create an array for holding the data you want to send.
     // uint8_t *payload = order;

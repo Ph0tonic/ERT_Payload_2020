@@ -23,10 +23,10 @@ void wakeUpPi()
 
 void readData()
 {
-    if(Serial1.available()){
-        int size = Serial1.read();
+    if(serial.available()){
+        int size = serial.read();
         // TODO: Read data
-        String data = Serial.read();
+        String data = serial.read();
     }
 }
 
