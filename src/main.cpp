@@ -40,7 +40,7 @@ enum SignalRF_enum
 
 const float TAKE_OFF_TIME_MS = 0.500;
 const float TAKE_OFF_ACCELERATION_G = 3.0f;
-const float FLYING_TIME_S = 10.0;// * 60; //TODO: Change this
+const float FLYING_TIME_S = 10.0; // * 60; //TODO: Change this
 
 uint8_t state;
 time_t timer_takeoff = 0;
@@ -71,7 +71,6 @@ void startRecording();
 void stopRecording();
 SignalRF_enum readRF();
 bool detectLiftoff();
-void sonorSignalState();
 
 void loop()
 {
@@ -172,7 +171,7 @@ void stateMachineRun(uint8_t rf_signal)
 
     case s_FLYING:
         elapsed_time = millis();
-        if (timer_takeoff != 0 && (elapsed_time - timer_takeoff)/1000 >= FLYING_TIME_S)
+        if (timer_takeoff != 0 && (elapsed_time - timer_takeoff) / 1000 >= FLYING_TIME_S)
         {
             state = s_LANDED;
         }
@@ -195,51 +194,36 @@ bool inject()
 
 void startRecording()
 {
+    sendPiOrder(PiOrder::START_RECCORD);
+    //TODO: Wait for a response ???
 }
 
 void stopRecording()
 {
+    sendPiOrder(PiOrder::START_RECCORD);
+    //TODO: Wait for a response ???
 }
 
 SignalRF_enum readRF()
 {
-    return NONE;
+    int order = readXbee();
+    if (order != -1)
+    {
+        //TODO: Parse order
+    }
 }
 
 bool detectLiftoff()
 {
-    float acc = 0;// TODO: getG();
-    elapsed_time = millis();
-    if(acc < TAKE_OFF_ACCELERATION_G)
+    float acc = getAcceleration();
+    if (acc < TAKE_OFF_ACCELERATION_G)
     {
         timer_takeoff = millis();
         return false;
     }
+
+    // TODO: Add pressure diff detector
+    
+    elapsed_time = millis();
     return (timer_takeoff != 0 && (elapsed_time - timer_takeoff) >= TAKE_OFF_TIME_MS);
-}
-
-void sonorSignalState()
-{
-    switch (state)
-    {
-    case s_IDLE:
-        //TODO
-        break;
-
-    case s_STANDBY:
-        //TODO
-        break;
-
-    case s_READY:
-        //TODO
-        break;
-
-    case s_RECORDING:
-        //TODO
-        break;
-
-    case s_LANDED:
-        //TODO
-        break;
-    }
 }

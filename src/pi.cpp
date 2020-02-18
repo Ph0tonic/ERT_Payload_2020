@@ -3,10 +3,12 @@
 
 #include "pi.h"
 
+#define serial Serial1
+
 void setupPi()
 {
     pinMode(PIN_PI_OFF, OUTPUT);
-    Serial1.begin(9600);
+    serial.begin(9600);
 }
 
 void shutdownPi()
@@ -28,8 +30,14 @@ void readData()
     }
 }
 
+void sendPiOrder(PiOrder order)
+{
+    serial.write(order);
+    serial.flush();
+}
+
 void sendData(String data)
 {
-    Serial1.println(data);
-    Serial1.flush();
+    serial.println(data);
+    serial.flush();
 }

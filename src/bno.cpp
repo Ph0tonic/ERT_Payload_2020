@@ -42,23 +42,25 @@ void sampleBNO()
 
 float getAcceleration()
 {
+    //TODO: Check if this acceleration correspond to the wanted one
+    // return (float)bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL).magnitude;
     return (float)event.acceleration.heading;
 }
 
-float getRoll()
-{
-    return (float)event.orientation.x;
-}
+// float getRoll()
+// {
+//     return (float)event.orientation.x;
+// }
 
-float getPitch()
-{
-    return (float)event.orientation.y;
-}
+// float getPitch()
+// {
+//     return (float)event.orientation.y;
+// }
 
-float getHeadings()
-{
-    return (float)event.orientation.z;
-}
+// float getHeadings()
+// {
+//     return (float)event.orientation.z;
+// }
 
 
 void displaySensorDetails()
