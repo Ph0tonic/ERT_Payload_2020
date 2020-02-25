@@ -19,11 +19,20 @@ def stopRecording(_):
 def customCmd(cmd):
 	return 'Cmd `'+cmd+'` treated sucessfully'
 
+def getImage(_):
+	# iterable as source
+	data = [1, 2, 3, 4] 
+	array = bytearray(data)
+
+	ser.write(len(data))
+	ser.write(array)
+
 def manageOrder(order):
 	switcher = {
 		1: startRecording,
 		2: stopRecording,
-		3: customCmd
+		3: customCmd,
+		4: getImage
 	}
 	params = None
 	if(len(order.split(' ', 1)) == 1):

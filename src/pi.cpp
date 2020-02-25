@@ -21,25 +21,35 @@ void wakeUpPi()
     digitalWrite(PIN_PI_OFF, HIGH);
 }
 
-void readData()
+void getImage(byte** img, size_t* image_size)
 {
-    if(serial.available()){
-        int size = serial.read();
-        // TODO: Read data
-        String data = serial.read();
-    }
-}
-
-void sendPiOrder(PiOrder order)
-{
-    //serial.write(12);
-    //serial.println("Test");
-    serial.println("3 ls");
+    serial.println(0); //No params
     serial.flush();
+
+    *image_size = serial.read();
+    if(image_size == 0){
+        return;
+    }
+    *img = (byte*)malloc(*image_size);
+    serial.readBytes(*img, *image_size);
 }
 
-void sendData(String data)
+void sendPiOrder(PiOrder order, String param)
 {
-    serial.println(data);
+    switch (order)
+    {
+    case PiOrder::CMD_LINE:
+        serial.print(order);
+        serial.print(" ");
+        serial.println(param);
+        break;
+    case PiOrder::END_RECCORD:
+    case PiOrder::START_RECCORD:
+        serial.println((int)order); //No params
+        break;
+    default:
+        Serial.write("Unknown order");
+        break;
+    }
     serial.flush();
 }
