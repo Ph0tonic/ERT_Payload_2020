@@ -9,4 +9,5 @@
 - [x] State machine
 - [x] Communication serial Teensy -> Pi
 - [ ] Communication serial Pi -> Teensy
-- [ ] Communication Xbee
+- [ ] Communication Xbee Teensy -> GS
+- [ ] Communication Xbee GS -> Teensy

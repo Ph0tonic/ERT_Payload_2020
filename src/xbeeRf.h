@@ -4,9 +4,9 @@
 
 #define HOST_ADDRESS 0x0003
 
-void setupXbee();
-void sendXbee(uint8_t *order, uint8_t length);
-int readXbee();
+// void setupXbee();
+// void sendXbee(uint8_t *order, uint8_t length);
+// int readXbee();
 
 // enum Direction {DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NONE};
 // enum WMessageType {FOOT_STEP, HAND_GESTURE};

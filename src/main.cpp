@@ -5,7 +5,7 @@
 #include "led.h"
 #include "bno.h"
 #include "bme.h"
-#include "xbeeRf.h"
+#include "xbee.h"
 
 // RASPBERRY PI INFOS
 // RUN PIN 14 -> côté USB
@@ -84,10 +84,16 @@ void loop()
 //     }
 //     delay(1000);
 
-    delay(500);
-    Serial.write("Send order\n");
-    sendPiOrder(PiOrder::START_RECCORD);
+    // TEST TEENSY 2 PI
+    // delay(500);
+    // Serial.write("Send order\n");
+    // sendPiOrder(PiOrder::START_RECCORD);
     
+    // TEST TEENSY 2 GS
+    sendXbee(nullptr, 0);
+    Serial.println("Send XBEE");
+    delay(5000);
+
     // displaySensorEvents();
     // displayBmeValues();
     // lightOff();
