@@ -6,6 +6,7 @@
 #include "bno.h"
 #include "bme.h"
 #include "xbee.h"
+#include "packet.h"
 
 // RASPBERRY PI INFOS
 // RUN PIN 14 -> côté USB
@@ -26,16 +27,25 @@ enum State_enum
     s_FLYING = 5,
     s_LANDED = 6
 };
+
 enum SignalRF_enum
 {
     NONE,
-    GET_STATE,
-    SHUTDOWN,
-    WAKE,
-    INJECT,
-    BYPASS_INJECT,
-    REC,
-    ABORT
+    GET_STATE = 1,
+    SHUTDOWN = 2,
+    WAKE = 3,
+    INJECT = 4,
+    BYPASS_INJECT = 5,
+    REC = 6,
+    GET_IMAGE = 7,
+    ABORT = 8
+};
+
+enum MessageType_enum
+{
+    Image_packet,
+    GSP_Packet,
+    State_Packet
 };
 
 const float TAKE_OFF_TIME_MS = 0.500;
@@ -90,9 +100,18 @@ void loop()
     // sendPiOrder(PiOrder::START_RECCORD);
     
     // TEST TEENSY 2 GS
-    sendXbee(nullptr, 0);
+    
+    lightOn();
     Serial.println("Send XBEE");
-    delay(5000);
+    // sendXbee(nullptr, 0);
+    int packetSize = 0;
+    uint8_t* packet = createEmptyPacket(&packetSize);
+    free(packet);
+    Serial.println("Packet generated");
+
+    delay(2000);
+    lightOff();
+    delay(2000);
 
     // displaySensorEvents();
     // displayBmeValues();
@@ -203,13 +222,13 @@ bool inject()
 
 void startRecording()
 {
-    sendPiOrder(PiOrder::START_RECCORD);
+    sendPiOrder(PiOrder::START_RECCORD, "");
     //TODO: Wait for a response ???
 }
 
 void stopRecording()
 {
-    sendPiOrder(PiOrder::START_RECCORD);
+    sendPiOrder(PiOrder::START_RECCORD, "");
     //TODO: Wait for a response ???
 }
 

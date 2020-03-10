@@ -19,6 +19,9 @@ void shutdownPi()
 void wakeUpPi()
 {
     digitalWrite(PIN_PI_OFF, HIGH);
+
+    //TODO: Wait for confirmation of wakeupp and fully fonctionnal py
+    // Choose timeout
 }
 
 void getImage(byte** img, size_t* image_size)
@@ -48,7 +51,8 @@ void sendPiOrder(PiOrder order, String param)
         serial.println((int)order); //No params
         break;
     default:
-        Serial.write("Unknown order");
+        Serial.print("Unknown order");
+        Serial.println(order);
         break;
     }
     serial.flush();

@@ -18,6 +18,7 @@ void setupXbee()
  */
 void sendXbee(uint8_t *order, uint8_t length)
 {
+
     uint8_t command[] = {0x7E, //First bit signal
                         0x00, 0x10, // length
                         0x10,  // Frame type // Transmit Request frame - 0x10
@@ -30,6 +31,7 @@ void sendXbee(uint8_t *order, uint8_t length)
                         0xb4 // CRC
     };
     serial.write(command, sizeof(command));
+
     // for(int i=0;i<sizeof(command);++i) {
     //     serial.write(command[i]);
     // }
