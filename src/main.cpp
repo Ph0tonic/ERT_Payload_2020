@@ -5,19 +5,20 @@
 #include "led.h"
 #include "bno.h"
 #include "bme.h"
-#include "xbee.h"
 #include "packet.h"
+#include "xbee.h"
 
 // RASPBERRY PI INFOS
 // RUN PIN 14 -> côté USB
 
 //- off -> éteint
 //- idle -> Arduino et PI démarré
-//- standby -> Arduino make pi in (sleep mode/stady state)
+//- standby -> Arduino make pi in (sleep mode/steady state)
 //- injected -> Levures injectés, en attente
 //- ready -> both online and levure injectés
 //- recording -> Start detecting decollage
 //- landed -> When landed triggered -> emit GPS / (son)
+
 enum State_enum
 {
     s_IDLE = 1,

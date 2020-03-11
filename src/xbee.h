@@ -5,4 +5,4 @@
 
 void setupXbee();
 void sendXbee(Packet packet);
-OrderEnum readXbee()
+OrderEnum readXbee();
