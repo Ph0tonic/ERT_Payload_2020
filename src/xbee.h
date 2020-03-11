@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include "packet.h"
+
 void setupXbee();
 void sendXbee(Packet packet);
-int readXbee();
+OrderEnum readXbee()

@@ -99,13 +99,18 @@ void sendXbee(Packet packet)
     // }
 }
 
-int readXbee()
+OrderEnum readXbee()
 {
-    if (Serial1.available())
+    if (serial.available())
     {
-        return Serial1.read(); // will not be -1
+        uint8_t info[3];
+        serial.readBytes(info, 3);
+        uint16_t size = (info[1] << 8)| info[2];
+        uint8_t data[size];
+        serial.readBytes(data, size + 1);
+        return (OrderEnum)data[HEADER_SIZE-3+1];
     }
-    return -1;
+    return NONE;
 }
 
 /* Packet
