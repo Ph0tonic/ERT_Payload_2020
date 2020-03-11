@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-
+#include "packet.h"
 void setupXbee();
-void sendXbee(uint8_t *order, uint8_t length);
+void sendXbee(Packet packet);
 int readXbee();

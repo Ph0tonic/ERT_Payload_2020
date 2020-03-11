@@ -28,19 +28,6 @@ enum State_enum
     s_LANDED = 6
 };
 
-enum SignalRF_enum
-{
-    NONE,
-    GET_STATE = 1,
-    SHUTDOWN = 2,
-    WAKE = 3,
-    INJECT = 4,
-    BYPASS_INJECT = 5,
-    REC = 6,
-    GET_IMAGE = 7,
-    ABORT = 8
-};
-
 enum MessageType_enum
 {
     Image_packet,
@@ -51,10 +38,15 @@ enum MessageType_enum
 const float TAKE_OFF_TIME_MS = 0.500;
 const float TAKE_OFF_ACCELERATION_G = 3.0f;
 const float FLYING_TIME_S = 10.0; // * 60; //TODO: Change this
+const float GPS_EMIT_DELAY_MS = 500;
 
 uint8_t state;
+time_t gps_timer = 0;
 time_t timer_takeoff = 0;
-time_t elapsed_time = 0;
+
+// TESTS DATA
+OrderEnum rfSignals[] = {GET_STATE, SHUTDOWN, GET_STATE, WAKE, GET_STATE, INJECT, GET_STATE, REC, GET_STATE};
+const int nbSignals = (sizeof(rfSignals) / sizeof(OrderEnum));
 
 void setup()
 {
@@ -72,41 +64,50 @@ void setup()
     displaySensorDetails();
 }
 
-SignalRF_enum rfSignals[] = {GET_STATE, SHUTDOWN, GET_STATE, WAKE, GET_STATE, INJECT, GET_STATE, REC, GET_STATE};
-const int nbSignals = (sizeof(rfSignals) / sizeof(SignalRF_enum));
-
-void stateMachineRun(uint8_t rf_signal);
+void stateMachineRun(OrderEnum order);
 bool inject();
 void startRecording();
 void stopRecording();
-SignalRF_enum readRF();
 bool detectLiftoff();
 
 void loop()
 {
-//     delay(10000);
-//     for (unsigned int i = 0; i < nbSignals; ++i)
-//     {
-//         lightOn();
-//         stateMachineRun(rfSignals[i]);
-//         delay(200);
-//         lightOff();
-//     }
-//     delay(1000);
+    //Start sending GPS Data every ## MS
+    if (state >= s_READY)
+    {
+        time_t elapsed_time = millis();
+        if (gps_timer != 0 && (gps_timer - elapsed_time) >= GPS_EMIT_DELAY_MS)
+        {
+            //TODO: get GPS data
+            sendXbee(createGpsPacket(0, 46.520250, 6.566673, 397));
+            gps_timer = millis();
+        }
+    }
+
+    // TODO:Image transmitting system
+
+    //     delay(10000);
+    //     for (unsigned int i = 0; i < nbSignals; ++i)
+    //     {
+    //         lightOn();
+    //         stateMachineRun(rfSignals[i]);
+    //         delay(200);
+    //         lightOff();
+    //     }
+    //     delay(1000);
 
     // TEST TEENSY 2 PI
     // delay(500);
     // Serial.write("Send order\n");
     // sendPiOrder(PiOrder::START_RECCORD);
-    
+
     // TEST TEENSY 2 GS
-    
+
     lightOn();
     Serial.println("Send XBEE");
     // sendXbee(nullptr, 0);
-    int packetSize = 0;
-    uint8_t* packet = createEmptyPacket(&packetSize);
-    free(packet);
+    Packet packet = createEmptyPacket();
+    free(packet.data);
     Serial.println("Packet generated");
 
     delay(2000);
@@ -123,19 +124,21 @@ void loop()
     // delay(10);
 }
 
-void stateMachineRun(uint8_t rf_signal)
+void stateMachineRun(OrderEnum order)
 {
-    switch (rf_signal)
+    //General orders
+    switch (order)
     {
     case GET_STATE:
         Serial.print("STATE : ");
         Serial.println(state);
+        sendXbee(createStatePacket(state));
     }
+
     switch (state)
     {
     case s_IDLE:
-        //TODO
-        switch (rf_signal)
+        switch (order)
         {
         case SHUTDOWN:
             shutdownPi();
@@ -146,22 +149,16 @@ void stateMachineRun(uint8_t rf_signal)
             {
                 state = s_READY;
             }
-            else
-            {
-                //TODO Signals failure of injection
-            }
 
             break;
         case BYPASS_INJECT:
             state = s_READY;
             break;
         }
-        //TODO
         break;
 
     case s_STANDBY:
-        //TODO
-        switch (rf_signal)
+        switch (order)
         {
         case WAKE:
             wakeUpPi();
@@ -171,34 +168,39 @@ void stateMachineRun(uint8_t rf_signal)
         break;
 
     case s_READY:
-        switch (rf_signal)
+        switch (order)
         {
         case REC:
             startRecording();
             state = s_RECORDING;
             break;
+        case INJECT:
+            inject();
+            break;
         }
-        //TODO
         break;
 
     case s_RECORDING:
-        switch (rf_signal)
+        switch (order)
         {
+        case GET_IMAGE:
+            //TODO:
+            break;
         case ABORT:
             stopRecording();
             state = s_IDLE;
             break;
         }
-        //TODO Start detecting lift off
+        //Start detecting lift off
         if (detectLiftoff())
         {
-            //TODO After liftoff Start timer and when timer is over then switch to LANDED state
+            //After liftoff Start timer and when timer is over then switch to LANDED state
             state = s_FLYING;
         }
         break;
 
     case s_FLYING:
-        elapsed_time = millis();
+        time_t elapsed_time = millis();
         if (timer_takeoff != 0 && (elapsed_time - timer_takeoff) / 1000 >= FLYING_TIME_S)
         {
             state = s_LANDED;
@@ -206,7 +208,7 @@ void stateMachineRun(uint8_t rf_signal)
         break;
 
     case s_LANDED:
-        //TODO Start sending GPS Location (+ emit sound)
+        //TODO: Start sending GPS Location (+ emit sound)
         //startBuzzing();
         delay(10);
         //stopBuzzing();
@@ -217,6 +219,7 @@ void stateMachineRun(uint8_t rf_signal)
 
 bool inject()
 {
+    //TODO: Inject code
     return true;
 }
 
@@ -232,15 +235,6 @@ void stopRecording()
     //TODO: Wait for a response ???
 }
 
-SignalRF_enum readRF()
-{
-    int order = readXbee();
-    if (order != -1)
-    {
-        //TODO: Parse order
-    }
-}
-
 bool detectLiftoff()
 {
     float acc = getAcceleration();
@@ -251,7 +245,7 @@ bool detectLiftoff()
     }
 
     // TODO: Add pressure diff detector
-    
-    elapsed_time = millis();
+
+    time_t elapsed_time = millis();
     return (timer_takeoff != 0 && (elapsed_time - timer_takeoff) >= TAKE_OFF_TIME_MS);
 }
