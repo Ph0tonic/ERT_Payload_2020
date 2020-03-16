@@ -19,7 +19,7 @@
 //- recording -> Start detecting decollage
 //- landed -> When landed triggered -> emit GPS / (son)
 
-enum State_enum
+enum State
 {
     s_IDLE = 1,
     s_STANDBY = 2,
@@ -27,13 +27,6 @@ enum State_enum
     s_RECORDING = 4,
     s_FLYING = 5,
     s_LANDED = 6
-};
-
-enum MessageType_enum
-{
-    Image_packet,
-    GSP_Packet,
-    State_Packet
 };
 
 const float TAKE_OFF_TIME_MS = 0.500;
@@ -58,6 +51,7 @@ void setup()
     setupPi();
     setupBuzzer();
     setupLight();
+    setupXbee();
     setupBno();
     setupBme();
 
@@ -97,23 +91,69 @@ void loop()
     //     }
     //     delay(1000);
 
-    // TEST TEENSY 2 PI
-    // delay(500);
-    // Serial.write("Send order\n");
-    // sendPiOrder(PiOrder::START_RECCORD);
-
-    // TEST TEENSY 2 GS
+    /*
+     * TEST TEENSY 2 PI
+     */
 
     lightOn();
-    Serial.println("Send XBEE");
-    // sendXbee(nullptr, 0);
-    Packet packet = createEmptyPacket();
-    free(packet.data);
-    Serial.println("Packet generated");
-
-    delay(2000);
+    delay(500);
+    Serial.write("Send order\n");
+    sendPiOrder(PiOrder::GET_IMAGE_BYTES, "");
+    
+    /*
+     * TEST PI 2 TEENS
+     */
     lightOff();
-    delay(2000);
+    delay(500);
+    Serial.write("Read order\n");
+    time_t elapsed_time = millis();
+    Packet p;
+    do {
+        if((millis() - elapsed_time) >= 500){
+            Serial.println("Restart");
+            return;
+        }
+        p = readPiData();
+    }
+    while(p.size <= 0);
+    
+    Serial.print("size");
+    Serial.println(p.size);
+    for(int i=0;i<p.size;++i)
+    {
+        Serial.print(p.data[i]);
+        Serial.print(",");
+    }
+    Serial.println("");
+
+    /*
+     * TEST TEENSY 2 GS
+     */
+
+    // lightOn();
+    // Serial.println("Send XBEE");
+    // // sendXbee(nullptr, 0);
+    // Packet packet = createEmptyPacket();
+    // sendXbee(packet);
+    // //free(packet.data);
+    // Serial.println("Packet generated");
+
+    // delay(2000);
+    // lightOff();
+    // delay(2000);
+    
+    // readXbee();
+
+    
+    // lightOn();
+    // Serial.println("Send XBEE");
+    // sendXbee(createStatePacket(state));
+    // free(packet.data);
+    // Serial.println("Packet generated");
+
+    // delay(2000);
+    // lightOff();
+    // delay(2000);
 
     // displaySensorEvents();
     // displayBmeValues();

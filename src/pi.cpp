@@ -37,14 +37,37 @@ void getImage(byte** img, size_t* image_size)
     serial.readBytes(*img, *image_size);
 }
 
+Packet readPiData()
+{
+    Packet packet{
+        .size = 0,
+        .data = nullptr
+    };
+    if(serial.available())
+    {
+        packet.size = serial.read();
+    } else {
+        return packet;
+    }
+
+    packet.data = new uint8_t[packet.size];
+    int i = 0;
+    while(i<packet.size) {
+        if(serial.available()){
+            i += serial.readBytes(packet.data + i, packet.size-i);
+        } else {
+            delay(20);
+        }
+    }
+    return packet;
+}
+
 void sendPiOrder(PiOrder order, String param)
 {
     switch (order)
     {
-    case PiOrder::CMD_LINE:
-        serial.print(order);
-        serial.print(" ");
-        serial.println(param);
+    case PiOrder::GET_IMAGE_BYTES:
+        serial.println((int)order);
         break;
     case PiOrder::END_RECCORD:
     case PiOrder::START_RECCORD:
