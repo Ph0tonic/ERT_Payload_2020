@@ -45,19 +45,30 @@ Packet readPiData()
     };
     if(serial.available())
     {
-        packet.size = serial.read();
+        int8_t b1 = serial.read();
+        int8_t b2 = serial.read();
+        packet.size = b2 << 8 | b1;
     } else {
         return packet;
     }
+    Serial.print("Packet of size ");
+    Serial.print(packet.size);
+    Serial.println("received and content is :");
 
     packet.data = new uint8_t[packet.size];
     int i = 0;
     while(i<packet.size) {
         if(serial.available()){
             i += serial.readBytes(packet.data + i, packet.size-i);
+            Serial.println(i);
         } else {
-            delay(20);
+            //delay(20);
         }
+    }
+    i = 0;
+    while(i<packet.size) {
+        Serial.println(packet.data[i]);
+        i++;
     }
     return packet;
 }
