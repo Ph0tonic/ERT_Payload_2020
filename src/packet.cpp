@@ -60,8 +60,67 @@ Packet createTemperaturePacket(float temperature)
         (uint32_t)temperature,
         (uint32_t)temperature >> 8,
         (uint32_t)temperature >> 16,
-        (uint32_t)temperature >> 24};
-    return createPacket(data, 1);
+        (uint32_t)temperature >> 24
+    };
+    return createPacket(data, 4);
+}
+
+Packet createBNOPacket(int8_t temperature, float* orientation, float* acceleration)
+{
+        uint8_t data[28] = {
+        (uint32_t)temperature,
+        (uint32_t)temperature >> 8,
+        (uint32_t)temperature >> 16,
+        (uint32_t)temperature >> 24,
+        (uint32_t)orientation[0],
+        (uint32_t)orientation[0] >> 8,
+        (uint32_t)orientation[0] >> 16,
+        (uint32_t)orientation[0] >> 24,
+        (uint32_t)orientation[1],
+        (uint32_t)orientation[1] >> 8,
+        (uint32_t)orientation[1] >> 16,
+        (uint32_t)orientation[1] >> 24,
+        (uint32_t)orientation[2],
+        (uint32_t)orientation[2] >> 8,
+        (uint32_t)orientation[2] >> 16,
+        (uint32_t)orientation[2] >> 24,
+        (uint32_t)acceleration[0],
+        (uint32_t)acceleration[0] >> 8,
+        (uint32_t)acceleration[0] >> 16,
+        (uint32_t)acceleration[0] >> 24,
+        (uint32_t)acceleration[1],
+        (uint32_t)acceleration[1] >> 8,
+        (uint32_t)acceleration[1] >> 16,
+        (uint32_t)acceleration[1] >> 24,
+        (uint32_t)acceleration[2],
+        (uint32_t)acceleration[2] >> 8,
+        (uint32_t)acceleration[2] >> 16,
+        (uint32_t)acceleration[2] >> 24
+    };
+    return createPacket(data, 28);
+}
+
+Packet createBMEPacket(float temperature, float pressure, float humidity, float altitude)
+{
+    uint8_t data[16] = {
+        (uint32_t)temperature,
+        (uint32_t)temperature >> 8,
+        (uint32_t)temperature >> 16,
+        (uint32_t)temperature >> 24,
+        (uint32_t)pressure,
+        (uint32_t)pressure >> 8,
+        (uint32_t)pressure >> 16,
+        (uint32_t)pressure >> 24,
+        (uint32_t)humidity,
+        (uint32_t)humidity >> 8,
+        (uint32_t)humidity >> 16,
+        (uint32_t)humidity >> 24,
+        (uint32_t)altitude,
+        (uint32_t)altitude >> 8,
+        (uint32_t)altitude >> 16,
+        (uint32_t)altitude >> 24
+    };
+    return createPacket(data, 16);
 }
 
 Packet createImagePacket()

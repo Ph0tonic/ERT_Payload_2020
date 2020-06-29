@@ -41,7 +41,9 @@ Packet createPacket(uint8_t *data, int dataSize);
 Packet createEmptyPacket();
 Packet createStatePacket(uint8_t state);
 Packet createGpsPacket(uint8_t sats_num, float latitude, float longitude, float altitude);
-Packet createTemperaturePacket(float temperature);
+Packet createBMEPacket(float temperature, float pressure, float humidity, float altitude);
+Packet createBNOPacket(int8_t temperature, float* orientation, float* acceleration);
+
 OrderEnum parseMessage(Packet packet);
 
 // Tools

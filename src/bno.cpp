@@ -9,7 +9,8 @@ static bool setupFail = false;
 //#define BNO055_SAMPLERATE_DELAY_MS (100)
 
 Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28);
-sensors_event_t event;
+sensors_event_t simpleEvent;
+sensors_event_t accelEvent;
 
 void setupBno()
 {
@@ -32,36 +33,28 @@ void setupBno()
 
 void sampleBNO()
 {
-    bno.getEvent(&event);
+    bno.getEvent(&simpleEvent);
+    bno.getEvent(&accelEvent, Adafruit_BNO055::VECTOR_LINEARACCEL);
 }
 
-// sensors_event_t getSampleData()
-// {
-//     return event;
-// }
-
-float getAcceleration()
+int8_t getBNOTemperatureC()
 {
-    //TODO: Check if this acceleration correspond to the wanted one
-    // return (float)bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL).magnitude;
-    return (float)event.acceleration.heading;
+    return bno.getTemp();
 }
 
-// float getRoll()
-// {
-//     return (float)event.orientation.x;
-// }
+void getOrientation(float* data)
+{
+    data[0] = simpleEvent.orientation.x;
+    data[1] = simpleEvent.orientation.y;
+    data[2] = simpleEvent.orientation.z;
+}
 
-// float getPitch()
-// {
-//     return (float)event.orientation.y;
-// }
-
-// float getHeadings()
-// {
-//     return (float)event.orientation.z;
-// }
-
+void getAcceleration(float* data)
+{
+    data[0] = accelEvent.acceleration.x;
+    data[1] = accelEvent.acceleration.y;
+    data[2] = accelEvent.acceleration.z;
+}
 
 void displaySensorDetails()
 {
@@ -113,7 +106,7 @@ void displaySensorEvents()
     Serial.print(F(" "));
     Serial.print((float)event.orientation.z);
     Serial.println(F(""));
-    
+
     /* Also send calibration data for each sensor. */
     uint8_t sys, gyro, accel, mag = 0;
     bno.getCalibration(&sys, &gyro, &accel, &mag);

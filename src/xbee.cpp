@@ -34,20 +34,20 @@ void sendXbee(Packet packet)
     //serial.write(packet.data, packet.size);
 }
 
-OrderEnum readXbee()
-{
-    if (serial.available())
-    {
-        uint8_t info[3];
-        serial.readBytes(info, 3);
-        uint16_t size = (info[1] << 8)| info[2];
-        uint8_t data[size];
-        serial.readBytes(data, size + 1);
-        Serial.println("Received some data :)");
-        return (OrderEnum)data[HEADER_SIZE-3+1];
-    }
-    return NONE;
-}
+// OrderEnum readXbee()
+// {
+//     if (serial.available())
+//     {
+//         uint8_t info[3];
+//         serial.readBytes(info, 3);
+//         uint16_t size = (info[1] << 8)| info[2];
+//         uint8_t data[size];
+//         serial.readBytes(data, size + 1);
+//         Serial.println("Received some data :)");
+//         return (OrderEnum)data[HEADER_SIZE-3+1];
+//     }
+//     return NONE;
+// }
 
 /* Packet
 delimiter 1B

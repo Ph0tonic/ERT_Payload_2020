@@ -2,8 +2,6 @@
 
 static bool setupFail = false;
 
-#include <Wire.h>
-
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
@@ -15,6 +13,16 @@ static bool setupFail = false;
 #define SEALEVELPRESSURE_HPA (1013.25)
 
 Adafruit_BME280 bme;
+
+void setupBme()
+{
+    Serial.println("Bme config");
+
+    if (!bme.begin(&Wire1))
+    {
+        Serial.println("Could not find a valid BME280 sensor, check wiring!");
+    }
+}
 
 void displayBmeValues()
 {
@@ -36,16 +44,6 @@ void displayBmeValues()
     Serial.println(" %");
 
     Serial.println();
-}
-
-void setupBme()
-{
-    Serial.println("Bme config");
-
-    if (!bme.begin(0x77, &Wire))
-    {
-        Serial.println("Could not find a valid BME280 sensor, check wiring!");
-    }
 }
 
 float getTemperatureC()
