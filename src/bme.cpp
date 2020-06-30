@@ -16,9 +16,10 @@ Adafruit_BME280 bme;
 
 void setupBme()
 {
+    Wire1.begin();
     Serial.println("Bme config");
 
-    if (!bme.begin(&Wire1))
+    if (!bme.begin(0x77, &Wire1))
     {
         Serial.println("Could not find a valid BME280 sensor, check wiring!");
     }
