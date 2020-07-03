@@ -33,8 +33,8 @@ void setupBno()
 
 void sampleBNO()
 {
-    bno.getEvent(&simpleEvent);
-    bno.getEvent(&accelEvent, Adafruit_BNO055::VECTOR_LINEARACCEL);
+    bno.getEvent(&simpleEvent, Adafruit_BNO055::VECTOR_EULER);
+    bno.getEvent(&accelEvent, Adafruit_BNO055::VECTOR_ACCELEROMETER);
 }
 
 int8_t getBNOTemperatureC()
