@@ -130,12 +130,16 @@ void loop()
         int nb_sat = 0;
 
         // Get localisation data
-        getLocalisation(&latitude, &longitude, &altitude, &nb_sat);
+        bool data = sampleGPS();
+        if (data)
+        {
+            getLocalisation(&latitude, &longitude, &altitude, &nb_sat, &hdop);
 
-        // Send GPS
-        sendXbee(createGpsPacket(nb_sat, hdop, altitude, latitude, longitude));
+            // Send GPS
+            sendXbee(createGpsPacket(nb_sat, hdop, altitude, latitude, longitude));
+        }
     }
-    
+
     // GPS log
     elapsed_time = millis();
     if (gps_log_timer == 0 || (elapsed_time - gps_log_timer) >= GPS_LOG_MS)
@@ -150,19 +154,25 @@ void loop()
         int nb_sat = 0;
 
         // Get localisation data
-        getLocalisation(&latitude, &longitude, &altitude, &nb_sat);
+        bool data = sampleGPS();
+        if (data)
+        {
+            getLocalisation(&latitude, &longitude, &altitude, &nb_sat, &hdop);
 
 #ifdef DEBUG
-        Serial.print("GPS - altitude : ");
-        Serial.print(altitude);
-        Serial.print("\t latitude : ");
-        Serial.print(altitude);
-        Serial.print("\t longitude : ");
-        Serial.println(altitude);
+            Serial.print("GPS - altitude : ");
+            Serial.print(altitude);
+            Serial.print("\t latitude : ");
+            Serial.print(altitude);
+            Serial.print("\t longitude : ");
+            Serial.println(altitude);
 #endif
 
-        // Log GPS
-        logGPS(millis(), altitude, latitude, longitude);
+            // Log GPS
+            logGPS(millis(), altitude, latitude, longitude);
+        } else {
+            Serial.println("No GPS data");
+        }
     }
 
     // BME
@@ -180,7 +190,6 @@ void loop()
         // Send BME
         sendXbee(createBMEPacket(temperature, pressure, humidity, altitude));
     }
-
 
     elapsed_time = millis();
     if (bme_log_timer == 0 || (elapsed_time - bme_log_timer) >= BME_LOG_MS)
