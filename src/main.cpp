@@ -4,6 +4,7 @@
 #include "buzzer.h"
 #include "led.h"
 #include "bno.h"
+#include "gps.h"
 #include "bme.h"
 #include "packet.h"
 #include "xbee.h"
@@ -12,15 +13,15 @@
 #define DEBUG true
 
 // To be determined
-#define GPS_LOG_MS 500
+#define GPS_LOG_MS 10
 #define GPS_XBEE_MS 500
 
 // https://learn.adafruit.com/adafruit-bme280-humidity-barometric-pressure-temperature-sensor-breakout
-#define BME_LOG_MS 500
+#define BME_LOG_MS 10
 #define BME_XBEE_MS 500
 
 // https://learn.adafruit.com/adafruit-bno055-absolute-orientation-sensor?view=all
-#define BNO_LOG_MS 500
+#define BNO_LOG_MS 10
 #define BNO_XBEE_MS 500
 
 time_t gps_log_timer = 0;
@@ -96,6 +97,7 @@ void setup()
     setupXbee();
     setupBno();
     setupBme();
+    setupGps();
     // setupPi();
 
     // /* Display some basic information on this sensor */
@@ -125,9 +127,13 @@ void loop()
         float latitude = 11.0;
         float longitude = 12.0;
         float hdop = 0.0;
+        int nb_sat = 0;
+
+        // Get localisation data
+        getLocalisation(&latitude, &longitude, &altitude, &nb_sat);
 
         // Send GPS
-        sendXbee(createGpsPacket(1, hdop, altitude, latitude, longitude));
+        sendXbee(createGpsPacket(nb_sat, hdop, altitude, latitude, longitude));
     }
     
     // GPS log
@@ -141,6 +147,10 @@ void loop()
         float latitude = 11.0;
         float longitude = 12.0;
         float hdop = 0.0;
+        int nb_sat = 0;
+
+        // Get localisation data
+        getLocalisation(&latitude, &longitude, &altitude, &nb_sat);
 
 #ifdef DEBUG
         Serial.print("GPS - altitude : ");

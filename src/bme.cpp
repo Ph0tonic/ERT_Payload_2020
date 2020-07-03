@@ -5,6 +5,7 @@ static bool setupFail = false;
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
+// TODO A supprimer une fois testé
 #define BME_SCK 13
 #define BME_MISO 12
 #define BME_MOSI 11
