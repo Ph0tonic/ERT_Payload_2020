@@ -12,20 +12,23 @@
 #define DEBUG true
 
 // To be determined
-#define GPS_LOG_MS 200
-#define GPS_XBEE_MS 200
+#define GPS_LOG_MS 500
+#define GPS_XBEE_MS 500
 
 // https://learn.adafruit.com/adafruit-bme280-humidity-barometric-pressure-temperature-sensor-breakout
-#define BME_LOG_MS 200
-#define BME_XBEE_MS 200
+#define BME_LOG_MS 500
+#define BME_XBEE_MS 500
 
 // https://learn.adafruit.com/adafruit-bno055-absolute-orientation-sensor?view=all
-#define BNO_LOG_MS 20
-#define BNO_XBEE_MS 20
+#define BNO_LOG_MS 500
+#define BNO_XBEE_MS 500
 
-time_t gps_timer = 0;
-time_t bme_timer = 0;
-time_t bno_timer = 0;
+time_t gps_log_timer = 0;
+time_t bme_log_timer = 0;
+time_t bno_log_timer = 0;
+time_t gps_xbee_timer = 0;
+time_t bme_xbee_timer = 0;
+time_t bno_xbee_timer = 0;
 
 // RASPBERRY PI INFOS
 // RUN PIN 14 -> côté USB
@@ -76,9 +79,12 @@ void setup()
     stopBuzzing();
 
     // Init timers
-    bme_timer = 0;
-    bno_timer = 0;
-    gps_timer = 0;
+    bme_log_timer = 0;
+    bno_log_timer = 0;
+    gps_log_timer = 0;
+    bme_xbee_timer = 0;
+    bno_xbee_timer = 0;
+    gps_xbee_timer = 0;
 
     //State initialize
     // state = s_IDLE;
@@ -87,7 +93,7 @@ void setup()
     setupLogging();
     // setupBuzzer();
     setupLight();
-    // setupXbee();
+    setupXbee();
     setupBno();
     setupBme();
     // setupPi();
@@ -108,21 +114,33 @@ void setup()
 
 void loop()
 {
-    lightOn();
-    delay(2000);
-    lightOff();
-    delay(2000);
-
     // GPS
     time_t elapsed_time = millis();
-    if (gps_timer == 0 || (elapsed_time - gps_timer) >= GPS_XBEE_MS)
+    if (gps_xbee_timer == 0 || (elapsed_time - gps_xbee_timer) >= GPS_XBEE_MS)
     {
-        gps_timer = millis();
+        gps_xbee_timer = millis();
 
         // TODO: get GPS data
-        float altitude = 0.0;
-        float latitude = 0.0;
-        float longitude = 0.0;
+        float altitude = 950.0;
+        float latitude = 11.0;
+        float longitude = 12.0;
+        float hdop = 0.0;
+
+        // Send GPS
+        sendXbee(createGpsPacket(1, hdop, altitude, latitude, longitude));
+    }
+    
+    // GPS log
+    elapsed_time = millis();
+    if (gps_log_timer == 0 || (elapsed_time - gps_log_timer) >= GPS_LOG_MS)
+    {
+        gps_log_timer = millis();
+
+        // TODO: get GPS data
+        float altitude = 950.0;
+        float latitude = 11.0;
+        float longitude = 12.0;
+        float hdop = 0.0;
 
 #ifdef DEBUG
         Serial.print("GPS - altitude : ");
@@ -135,16 +153,29 @@ void loop()
 
         // Log GPS
         logGPS(millis(), altitude, latitude, longitude);
-
-        // Send GPS
-        // sendXbee(createGpsPacket(altitude, latitude, longitude));
     }
 
     // BME
     elapsed_time = millis();
-    if (bme_timer == 0 || (elapsed_time - bme_timer) >= BME_XBEE_MS)
+    if (bme_xbee_timer == 0 || (elapsed_time - bme_xbee_timer) >= BME_XBEE_MS)
     {
-        bme_timer = millis();
+        bme_xbee_timer = millis();
+
+        // get BME DATA
+        float temperature = getTemperatureC();
+        float pressure = getPressureP();
+        float altitude = getAltitudeM();
+        float humidity = getHumidity();
+
+        // Send BME
+        sendXbee(createBMEPacket(temperature, pressure, humidity, altitude));
+    }
+
+
+    elapsed_time = millis();
+    if (bme_log_timer == 0 || (elapsed_time - bme_log_timer) >= BME_LOG_MS)
+    {
+        bme_log_timer = millis();
 
         // get BME DATA
         float temperature = getTemperatureC();
@@ -165,16 +196,33 @@ void loop()
 
         // Log BME
         logBME(millis(), temperature, pressure, humidity, altitude);
-
-        // Send GPS
-        // sendXbee(createBMEPacket(temperature, pressure, humidity, appoxAltitude));
     }
 
     // BNO
     elapsed_time = millis();
-    if (bno_timer == 0 || (elapsed_time - bno_timer) >= BNO_XBEE_MS)
+    if (bno_xbee_timer == 0 || (elapsed_time - bno_xbee_timer) >= BNO_XBEE_MS)
     {
-        bno_timer = millis();
+        bno_xbee_timer = millis();
+
+        // Sample data
+        sampleBNO();
+
+        // get BNO data
+        float orientation[3];
+        float acceleration[3];
+        int8_t temperature = getBNOTemperatureC();
+        getOrientation(orientation);
+        getAcceleration(acceleration);
+
+        // Send BNO
+        sendXbee(createBNOPacket(temperature, orientation, acceleration));
+    }
+
+    // BNO
+    elapsed_time = millis();
+    if (bno_log_timer == 0 || (elapsed_time - bno_log_timer) >= BNO_LOG_MS)
+    {
+        bno_log_timer = millis();
 
         // Sample data
         sampleBNO();
@@ -205,9 +253,6 @@ void loop()
 
         // Log BNO
         logBNO(millis(), temperature, orientation, acceleration);
-
-        // Send BNO
-        // sendXbee(createBNOPacket(temperature, orientation, acceleration));
     }
 
     // // Start sending GPS Data every ## MS

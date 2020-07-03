@@ -18,20 +18,21 @@ void setupXbee()
  */
 void sendXbee(Packet packet)
 {
-    uint8_t command[] = {0x7E, //First bit signal
-                        0x00, 0x10, // length
-                        0x10,  // Frame type // Transmit Request frame - 0x10
-                        0x00,  // Frame ID - Setting it to '0' will disable response frame.
-                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, // 64 bit dest address // broadcast
-                        0xff, 0xfe, // 16 bits dest address (0xff fe = broadcast) unknown address
-                        0x00, // Broadcast radius (0 = max) no hops
-                        0x43,                     0xff, //DATA
-                        0xfe, //DATA
-                        0xb4 // CRC
-    };
+    // uint8_t emptyCommand[] = {
+    //                     0x7E, //First bit signal
+    //                     0x00, 0x10, // length
+    //                     0x10,  // Frame type // Transmit Request frame - 0x10
+    //                     0x00,  // Frame ID - Setting it to '0' will disable response frame.
+    //                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, // 64 bit dest address // broadcast
+    //                     0xff, 0xfe, // 16 bits dest address (0xff fe = broadcast) unknown address
+    //                     0x00, // Broadcast radius (0 = max) no hops
+    //                     0x43,                     0xff, //DATA
+    //                     0xfe, //DATA
+    //                     0xb4 // CRC
+    // };
     Serial.print("Res : ");
-    Serial.println(serial.write(command, sizeof(command)/sizeof(uint8_t)));
-    //serial.write(packet.data, packet.size);
+    // Serial.println(serial.write(emptyCommand, sizeof(emptyCommand)/sizeof(uint8_t)));
+    Serial.println(serial.write(packet.data, packet.size));
 }
 
 // OrderEnum readXbee()

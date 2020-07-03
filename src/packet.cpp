@@ -14,7 +14,7 @@ OrderEnum parseMessage(Packet packet)
 
 Packet createEmptyPacket()
 {
-    uint8_t data[] = {0xff, 0xfe};
+    uint8_t data[2] = {0xff, 0xfe};
     Packet packet = createPacket(data, 2);
 
     uint8_t crcPrecalculated = 0xb4;
@@ -29,23 +29,29 @@ Packet createEmptyPacket()
     return packet;
 }
 
-Packet createGpsPacket(uint8_t sats_num, float latitude, float longitude, float altitude)
+Packet createGpsPacket(uint8_t sats_num, float hdop, float latitude, float longitude, float altitude)
 {
-    uint8_t data[13] = {
-        sats_num,
-        (uint32_t)latitude,
-        (uint32_t)latitude >> 8,
-        (uint32_t)latitude >> 16,
-        (uint32_t)latitude >> 24,
-        (uint32_t)longitude,
-        (uint32_t)longitude >> 8,
-        (uint32_t)longitude >> 16,
-        (uint32_t)longitude >> 24,
-        (uint32_t)altitude,
-        (uint32_t)altitude >> 8,
-        (uint32_t)altitude >> 16,
-        (uint32_t)altitude >> 24};
-    return createPacket(data, 13);
+    int time = millis();
+
+    uint8_t data[26] = {
+        1,
+        'E',
+        'P',
+        'F',
+        'L',
+        time >> 24,
+        time >> 16,
+        time >> 8,
+        time,
+        sats_num
+    };
+    
+    write(data + 10, hdop);
+    write(data + 14, latitude);
+    write(data + 18, longitude);
+    write(data + 22, altitude);
+
+    return createPacket(data, 26);
 }
 
 Packet createStatePacket(uint8_t state)
@@ -56,71 +62,72 @@ Packet createStatePacket(uint8_t state)
 
 Packet createTemperaturePacket(float temperature)
 {
-    uint8_t data[4] = {
-        (uint32_t)temperature,
-        (uint32_t)temperature >> 8,
-        (uint32_t)temperature >> 16,
-        (uint32_t)temperature >> 24
+    int time = millis();
+    uint8_t data[13] = {
+        1,
+        'E',
+        'P',
+        'F',
+        'L',
+        time >> 24,
+        time >> 16,
+        time >> 8,
+        time
     };
-    return createPacket(data, 4);
+    
+    write(data + 9, temperature);
+
+    return createPacket(data, 13);
 }
 
 Packet createBNOPacket(int8_t temperature, float* orientation, float* acceleration)
 {
-        uint8_t data[28] = {
-        (uint32_t)temperature,
-        (uint32_t)temperature >> 8,
-        (uint32_t)temperature >> 16,
-        (uint32_t)temperature >> 24,
-        (uint32_t)orientation[0],
-        (uint32_t)orientation[0] >> 8,
-        (uint32_t)orientation[0] >> 16,
-        (uint32_t)orientation[0] >> 24,
-        (uint32_t)orientation[1],
-        (uint32_t)orientation[1] >> 8,
-        (uint32_t)orientation[1] >> 16,
-        (uint32_t)orientation[1] >> 24,
-        (uint32_t)orientation[2],
-        (uint32_t)orientation[2] >> 8,
-        (uint32_t)orientation[2] >> 16,
-        (uint32_t)orientation[2] >> 24,
-        (uint32_t)acceleration[0],
-        (uint32_t)acceleration[0] >> 8,
-        (uint32_t)acceleration[0] >> 16,
-        (uint32_t)acceleration[0] >> 24,
-        (uint32_t)acceleration[1],
-        (uint32_t)acceleration[1] >> 8,
-        (uint32_t)acceleration[1] >> 16,
-        (uint32_t)acceleration[1] >> 24,
-        (uint32_t)acceleration[2],
-        (uint32_t)acceleration[2] >> 8,
-        (uint32_t)acceleration[2] >> 16,
-        (uint32_t)acceleration[2] >> 24
+        
+    int time = millis();
+    uint8_t data[34] = {
+        13,
+        'E',
+        'P',
+        'F',
+        'L',
+        time >> 24,
+        time >> 16,
+        time >> 8,
+        time,
+        temperature
     };
-    return createPacket(data, 28);
+    
+    write(data + 10, orientation[0]);
+    write(data + 14, orientation[1]);
+    write(data + 18, orientation[2]);
+    write(data + 22, acceleration[0]);
+    write(data + 26, acceleration[1]);
+    write(data + 30, acceleration[2]);
+
+    return createPacket(data, 34);
 }
 
 Packet createBMEPacket(float temperature, float pressure, float humidity, float altitude)
 {
-    uint8_t data[16] = {
-        (uint32_t)temperature,
-        (uint32_t)temperature >> 8,
-        (uint32_t)temperature >> 16,
-        (uint32_t)temperature >> 24,
-        (uint32_t)pressure,
-        (uint32_t)pressure >> 8,
-        (uint32_t)pressure >> 16,
-        (uint32_t)pressure >> 24,
-        (uint32_t)humidity,
-        (uint32_t)humidity >> 8,
-        (uint32_t)humidity >> 16,
-        (uint32_t)humidity >> 24,
-        (uint32_t)altitude,
-        (uint32_t)altitude >> 8,
-        (uint32_t)altitude >> 16,
-        (uint32_t)altitude >> 24
+    
+    int time = millis();
+    uint8_t data[25] = {
+        12,
+        'E',
+        'P',
+        'F',
+        'L',
+        time >> 24,
+        time >> 16,
+        time >> 8,
+        time
     };
-    return createPacket(data, 16);
+
+    write(data + 9, temperature);
+    write(data + 13, pressure);
+    write(data + 17, humidity);
+    write(data + 21, altitude);
+    return createPacket(data, 25);
 }
 
 Packet createImagePacket()
@@ -138,7 +145,7 @@ Packet createPacket(uint8_t *data, int dataSize)
     Serial.print("Final Packet Size : ");
     Serial.println(packet.size);
 
-    writeHeader(packet.data);
+    writeHeader(packet.data, packet.size - 4);
     writeData(packet.data, data, dataSize);
     writeCrc(packet.data, packet.size);
 
@@ -149,12 +156,14 @@ Packet createPacket(uint8_t *data, int dataSize)
  * Write the header inside packet
  * Requires packet size atleastr the size of HEADER
  */
-void writeHeader(uint8_t *packet)
+void writeHeader(uint8_t *packet, uint16_t size)
 {
     for (int i = 0; i < HEADER_SIZE; ++i)
     {
         packet[i] = HEADER[i];
     }
+    packet[1] = size >> 8;
+    packet[2] = size;
 }
 
 void writeData(uint8_t *packet, uint8_t *data, int dataSize)
@@ -174,4 +183,14 @@ void writeCrc(uint8_t *packet, int packetSize)
     }
 
     packet[packetSize - 1] = crc;
+}
+
+void write(uint8_t *data, float value)
+{
+    uint8_t *array;
+    array = reinterpret_cast<uint8_t*>(&value);    
+    data[0] = array[3];
+    data[1] = array[2];
+    data[2] = array[1];
+    data[3] = array[0];
 }

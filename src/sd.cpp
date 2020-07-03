@@ -9,7 +9,7 @@ File file;
 
 char csvFileName[] = "log_0000.csv";
 
-#define MaxCount 100000
+#define MaxCount 1000000
 
 #define BASE_NAME_SIZE 4
 #define NB_NUMBER_FILE 4
