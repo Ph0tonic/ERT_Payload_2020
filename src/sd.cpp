@@ -1,8 +1,6 @@
 #include <Arduino.h>
-#include <SD.h>
 
 #include "sd.h"
-#include "SdFat.h"
 
 SdFatSdio sd;
 File file;

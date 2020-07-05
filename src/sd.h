@@ -1,5 +1,7 @@
 #pragma once
 
+#include "SdFat.h"
+
 void setupLogging();
 void generateFileName();
 

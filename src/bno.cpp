@@ -15,7 +15,7 @@ sensors_event_t accelEvent;
 void setupBno()
 {
     Serial.println("BNO config");
-    if (!bno.begin())
+    if (!bno.begin(Adafruit_BNO055::OPERATION_MODE_ACCGYRO))
     {
         setupFail = true;
         Serial.println("Failed to initialize BNO055! Is the sensor connected?");
@@ -34,7 +34,7 @@ void setupBno()
 void sampleBNO()
 {
     bno.getEvent(&simpleEvent, Adafruit_BNO055::VECTOR_EULER);
-    bno.getEvent(&accelEvent, Adafruit_BNO055::VECTOR_ACCELEROMETER);
+    bno.getEvent(&accelEvent, Adafruit_BNO055::VECTOR_GYROSCOPE);
 }
 
 int8_t getBNOTemperatureC()
