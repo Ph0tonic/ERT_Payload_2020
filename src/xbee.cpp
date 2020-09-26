@@ -33,6 +33,8 @@ void sendXbee(Packet packet)
     Serial.print("Res : ");
     // Serial.println(serial.write(emptyCommand, sizeof(emptyCommand)/sizeof(uint8_t)));
     Serial.println(serial.write(packet.data, packet.size));
+
+    free(packet.data);
 }
 
 // OrderEnum readXbee()

@@ -166,6 +166,10 @@ void loop()
             Serial.print(altitude);
             Serial.print("\t longitude : ");
             Serial.println(altitude);
+            Serial.print("\t nb sat : ");
+            Serial.println(nb_sat);
+            Serial.print("\t hdop : ");
+            Serial.println(hdop);
 #endif
 
             // Log GPS
