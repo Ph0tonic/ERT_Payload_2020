@@ -34,7 +34,7 @@ Packet createGpsPacket(uint8_t sats_num, float hdop, float latitude, float longi
     int time = millis();
 
     uint8_t data[26] = {
-        1,
+        4,
         'E',
         'P',
         'F',
@@ -85,7 +85,7 @@ Packet createBNOPacket(int8_t temperature, float* orientation, float* accelerati
         
     int time = millis();
     uint8_t data[34] = {
-        13,
+        2,
         'E',
         'P',
         'F',
@@ -112,7 +112,7 @@ Packet createBMEPacket(float temperature, float pressure, float humidity, float 
     
     int time = millis();
     uint8_t data[25] = {
-        12,
+        3,
         'E',
         'P',
         'F',
